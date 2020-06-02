@@ -8,8 +8,10 @@
     >
       <v-timeline-item color="success" small>
         <v-row class="pt-1">
-          <v-col cols="3">
+          <v-col cols="2">
+            <div class="caption">
             {{ event.checkInTime | formatShortTime }}
+            </div>
           </v-col>
           <v-col>
             <strong>{{ event.shop.info.shopName }}</strong>

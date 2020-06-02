@@ -27,20 +27,34 @@
           >
         </v-card-actions>
       </v-card>
+      <CheckInStatusDialog
+        v-if="dialog"
+        :visible="dialog"
+        :checkInTime="shop.checkInTime"
+        :place="shop.info.shopName"
+        @close="closeDialog()"
+      ></CheckInStatusDialog>
     </div>
   </v-container>
 </template>
 
 <script>
 // @ is an alias to /src
+import CheckInStatusDialog from "@/components/CheckInStatusDialog.vue";
 
 export default {
   name: "Scan",
-  components: {},
+  components: {
+    CheckInStatusDialog
+  },
   data: function() {
     return {
       checkInURL: null,
-      shop: null
+      shop: null,
+
+      // show status dialog or not
+      // true = show when check-in/check-out complete
+      dialog: false
     };
   },
   computed: {},
@@ -73,16 +87,20 @@ export default {
       // check in
       await this.$store.dispatch("checkIn", shop);
 
-      console.log(">>>> sorted shop");
-      console.log(this.$store.getters.sortedShops);
-
-      // go to shops list
-      this.$router.push({ name: "Shops" });
+      // show dialog
+      this.dialog = true;
     },
     async checkOut(shop) {
       // check out
       await this.$store.dispatch("checkOut", shop);
 
+      this.goToShops();
+    },
+    closeDialog() {
+      this.dialog = false;
+      this.goToShops();
+    },
+    goToShops() {
       // go to shops list
       this.$router.push({ name: "Shops" });
     }
