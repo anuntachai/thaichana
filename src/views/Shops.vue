@@ -14,16 +14,20 @@
                 v-text="shop.info.businessType"
               ></v-card-subtitle>
 
-               <v-card-text>
+              <v-card-text>
                 <div v-if="!shop.isStay">
-                  <v-icon>mdi-home-export-outline</v-icon> {{ shop.checkOutTime | formatTime }} ({{ shop.checkOutTime | formatTimeVisited }})
+                  <v-icon>mdi-home-export-outline</v-icon>
+                  {{ shop.checkOutTime | formatTime }} ({{
+                    shop.checkOutTime | formatTimeVisited
+                  }})
                 </div>
                 <div v-if="shop.isStay">
-                  <v-icon>mdi-clock-time-four-outline</v-icon> {{ shop.checkInTime | formatTimer }}
+                  <v-icon>mdi-clock-time-four-outline</v-icon>
+                  {{ shop.checkInTime | formatTimer }}
                 </div>
               </v-card-text>
             </div>
-            <v-avatar class="ma-3" size="125" tile>
+            <v-avatar class="ma-3" size="100" tile>
               <v-btn
                 height="100"
                 width="100"
@@ -46,19 +50,36 @@
           </div>
         </v-card>
       </v-col>
+      <CheckInStatusDialog
+        v-if="dialog"
+        :visible="dialog"
+        :checkInTime="currentShop.checkInTime"
+        :place="currentShop.info.shopName"
+        @close="dialog = false"
+      ></CheckInStatusDialog>
     </v-row>
   </v-container>
 </template>
 
 <script>
 // @ is an alias to /src
+import CheckInStatusDialog from "@/components/CheckInStatusDialog.vue";
 
 export default {
   name: "Shops",
   data: function() {
-    return {};
+    return {
+      // show status dialog or not
+      // true = show when check-in/check-out complete
+      dialog: false,
+
+      // shop for showing status
+      currentShop: null
+    };
   },
-  components: {},
+  components: {
+    CheckInStatusDialog
+  },
   computed: {
     shops() {
       return this.$store.getters.sortedShops;
@@ -70,6 +91,10 @@ export default {
   methods: {
     checkIn(shop) {
       this.$store.dispatch("checkIn", shop);
+
+      // set data for displaying status
+      this.currentShop = shop;
+      this.dialog = true;
     },
     checkOut(shop) {
       this.$store.dispatch("checkOut", shop);

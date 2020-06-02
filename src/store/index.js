@@ -273,6 +273,27 @@ export default new Vuex.Store({
     },
     mobileNumber: function(state) {
       return state.mobileNumber;
+    },
+    timeline: function(state) {
+      let timelineArray = [];
+
+      // push all history event of all shop to array
+      state.shops.forEach(shop => {
+        shop.history.forEach(event => {
+          timelineArray.push({
+            shop: shop,
+            checkInTime: event.checkInTime,
+            checkOutTime: event.checkOutTime
+          });
+        });
+      });
+
+      // sort by check-in date
+      timelineArray.sort((a, b) => {
+        return b.checkInTime - a.checkInTime;
+      });
+
+      return timelineArray;
     }
   }
 });

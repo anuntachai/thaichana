@@ -26,6 +26,10 @@ class Shop {
 
     // lastest check-out time
     this.checkOutTime = null;
+
+    // check-in / check-out history
+    // Array of { checkInTime: [Check-In Date], checkOutTime: [Check-out Date] }
+    this.history = [];
   }
 
   toString() {
@@ -42,6 +46,16 @@ class Shop {
     if (data.checkOutTime) {
       this.checkOutTime = new Date(data.checkOutTime);
     }
+    if (data.history) {
+      this.history = [];
+      data.history.forEach(event => {
+        this.history.push({
+          checkInTime: new Date(event.checkInTime),
+          checkOutTime: event.checkOutTime ? new Date(event.checkOutTime) : null
+        });
+      });
+    }
+
     // for (let prop in this) {
     //   this[prop] = data[prop] || this[prop];
     // }
@@ -70,10 +84,18 @@ class Shop {
   checkIn() {
     this.checkInTime = new Date();
     this.checkOutTime = null;
+
+    // add current check-in to history (check-out = null)
+    this.history.push({
+      checkInTime: this.checkInTime,
+      checkOutTime: this.checkOutTime
+    });
   }
 
   checkOut() {
     this.checkOutTime = new Date();
+    // update check-out time to the lastest event in history
+    this.history[this.history.length - 1].checkOutTime = this.checkOutTime;
   }
 
   // Check user is stay in this shop or not

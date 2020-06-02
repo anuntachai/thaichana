@@ -4,6 +4,7 @@ import VueRouter from "vue-router";
 import Register from "@/views/Register.vue";
 import Scan from "@/views/Scan.vue";
 import Shops from "@/views/Shops.vue";
+import Timeline from "@/views/Timeline.vue";
 
 Vue.use(VueRouter);
 
@@ -31,6 +32,11 @@ const routes = [
     component: Shops,
     alias: "/",
     meta: { requiresAuth: true }
+  },
+  {
+    path: "/timeline",
+    name: "Timeline",
+    component: Timeline
   },
   {
     path: "/test",
