@@ -41,7 +41,8 @@
       <v-card-subtitle
         ><v-icon>mdi-cellphone-key</v-icon> Authentication Key: <br />{{
           authKey
-        }}</v-card-subtitle
+        }}<br /><br />
+        <v-icon>mdi-clock-time-four-outline</v-icon> Authenticated Time: <br />{{ authTime }}</v-card-subtitle
       >
 
       <v-card-actions>
@@ -78,6 +79,9 @@ export default {
     },
     authKey() {
       return this.$store.getters.authKey || "";
+    },
+    authTime() {
+      return this.$store.getters.authTime || "";
     }
   },
   methods: {

@@ -5,6 +5,7 @@ import Register from "@/views/Register.vue";
 import Scan from "@/views/Scan.vue";
 import Shops from "@/views/Shops.vue";
 import Timeline from "@/views/Timeline.vue";
+import SearchShop from "@/views/SearchShop.vue";
 
 Vue.use(VueRouter);
 
@@ -37,6 +38,11 @@ const routes = [
     path: "/timeline",
     name: "Timeline",
     component: Timeline
+  },
+  {
+    path: "/searchshop",
+    name: "SearchShop",
+    component: SearchShop
   },
   {
     path: "/test",

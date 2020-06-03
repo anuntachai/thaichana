@@ -34,6 +34,16 @@ Vue.filter("formatShortTime", function(value) {
     return moment(String(value)).format("DD/MM/YYYY HH:mm");
   }
 });
+Vue.filter("formatDateOnly", function(value) {
+  if (value) {
+    return moment(String(value)).format("LL");
+  }
+});
+Vue.filter("formatTimeOnly", function(value) {
+  if (value) {
+    return moment(String(value)).format("LT");
+  }
+});
 
 new Vue({
   router,

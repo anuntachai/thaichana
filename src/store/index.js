@@ -1,6 +1,7 @@
 import Vue from "vue";
 import Vuex from "vuex";
 const axios = require("axios");
+const moment = require("moment");
 
 import Shop from "./classes/shop.js";
 
@@ -15,6 +16,7 @@ export default new Vuex.Store({
     // authorization key
     authKey: null,
     authTime: null,
+    expiredIn: null,
 
     // visited shops
     // Data type: Array of Shop
@@ -40,9 +42,10 @@ export default new Vuex.Store({
     setMobileNumber(state, mobileNumber) {
       state.mobileNumber = mobileNumber;
     },
-    setAuthKey(state, authKey) {
+    setAuthValue(state, { authKey, authTime, expiredIn }) {
       state.authKey = authKey;
-      state.authTime = Date.now();
+      state.authTime = authTime;
+      state.expiredIn = expiredIn;
     }
   },
   actions: {
@@ -51,7 +54,8 @@ export default new Vuex.Store({
       console.log("Restoring state ...");
       state.mobileNumber = localStorage.mobileNumber || null;
       state.authKey = localStorage.authKey || null;
-      state.authTime = localStorage.authKey || null;
+      state.authTime = new Date(localStorage.authTime) || null;
+      state.expiredIn = localStorage.expiredIn || null;
       state.shops = [];
 
       if (localStorage.shops) {
@@ -73,6 +77,7 @@ export default new Vuex.Store({
       localStorage.mobileNumber = state.mobileNumber;
       localStorage.authKey = state.authKey;
       localStorage.authTime = state.authTime;
+      localStorage.expiredIn = state.expiredIn;
       localStorage.shops = JSON.stringify(state.shops);
       console.log(localStorage.shops);
       console.log("State saved!");
@@ -80,6 +85,8 @@ export default new Vuex.Store({
     async auth({ commit, dispatch }, mobileNumber) {
       console.log("Authenticating...");
       let authKey = null;
+      let authTime = new Date();
+      let expiredIn = null;
 
       try {
         // authenticate and get authKey
@@ -96,10 +103,11 @@ export default new Vuex.Store({
 
         // get authentication key (token from api)
         authKey = response.data.token;
+        expiredIn = parseInt(response.data.expiredIn) * 1000;
 
         if (authKey) {
           commit("setMobileNumber", mobileNumber);
-          commit("setAuthKey", authKey);
+          commit("setAuthValue", { authKey, authTime, expiredIn });
           dispatch("saveState");
 
           console.log("Authenticated!");
@@ -107,6 +115,23 @@ export default new Vuex.Store({
       } catch (error) {
         console.error(error);
         return;
+      }
+    },
+    // if current authKey is valid, do nothing
+    // if current authKey is not valid (created time is longer than validate duration), reauthenticate
+    async updateAuthKey({ state, dispatch }) {
+      console.log("check for update authKey...");
+
+      let validTime = moment(state.authTime);
+      validTime.add(state.expiredIn, "milliseconds");
+
+      let now = moment();
+
+      // authKey was expire, reauthenicate
+      if (validTime.isBefore(now)) {
+        await dispatch("auth", state.mobileNumber);
+      } else {
+        console.log("authKey is valid. do not update authKey.");
       }
     },
     // get shop from given url (from qr code) and set appId
@@ -168,6 +193,9 @@ export default new Vuex.Store({
     async checkIn({ state, commit, dispatch }, shop) {
       console.log("Checking-In Shop: " + shop.id);
 
+      // check auth or reauth
+      await dispatch("updateAuthKey");
+
       let currentTime = Date.now();
 
       try {
@@ -195,8 +223,8 @@ export default new Vuex.Store({
           commit("checkIn", shop);
           dispatch("saveState");
 
-          let checkInDate = new Date(currentTime);
-          console.log("Checked-in! " + checkInDate);
+          let checkInTime = new Date(currentTime);
+          console.log("Checked-in! " + checkInTime);
         } else {
           console.error("Cannot check-in!!!!");
         }
@@ -206,6 +234,9 @@ export default new Vuex.Store({
     },
     async checkOut({ state, commit, dispatch }, shop) {
       console.log("Checking-Out Shop: " + shop.id);
+
+      // check auth or reauth
+      await dispatch("updateAuthKey");
 
       let currentTime = Date.now();
 
@@ -255,6 +286,9 @@ export default new Vuex.Store({
     },
     authKey: function(state) {
       return state.authKey;
+    },
+    authTime: function(state) {
+      return state.authTime;
     },
     // Get sorted shops list
     // Sort by:

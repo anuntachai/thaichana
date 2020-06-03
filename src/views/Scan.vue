@@ -2,7 +2,7 @@
   <v-container>
     <div class="text-center"><h3>Scan QR</h3></div>
 
-    <div><qrcode-stream @decode="onDecode"></qrcode-stream></div>
+    <div><qrcode-stream @decode="onDecode" v-if="!shop"></qrcode-stream></div>
     <div v-if="shop != null">
       <v-card v-if="shop.info">
         <v-card-title>{{ shop.info.shopName }}</v-card-title>

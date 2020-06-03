@@ -40,7 +40,7 @@
         <router-view></router-view>
       </v-container>
     </v-content>
-    <v-bottom-navigation v-model="activeFooterNavBtn" fixed grow color="teal">
+    <v-bottom-navigation app v-model="activeFooterNavBtn" grow color="teal">
       <v-btn value="Scan" @click="changePage('/scan')">
         <span>Scan QR</span>
         <v-icon>mdi-qrcode-scan</v-icon>
@@ -64,6 +64,11 @@
         <span>Timeline</span>
         <v-icon>mdi-timeline-clock-outline</v-icon>
       </v-btn>
+
+      <!-- <v-btn value="SearchShop" @click="changePage('/searchshop')">
+        <span>Search</span>
+        <v-icon>mdi-home-search-outline</v-icon>
+      </v-btn> -->
 
       <v-btn value="Register" @click="changePage('/register')">
         <span>Register</span>
