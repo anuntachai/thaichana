@@ -7,8 +7,9 @@ import Shop from "./classes/shop.js";
 
 Vue.use(Vuex);
 
-export default new Vuex.Store({
+const store = new Vuex.Store({
   modules: {},
+  //strict: process.env.NODE_ENV !== "production",
   state: {
     // user's telephone number
     mobileNumber: null,
@@ -39,6 +40,12 @@ export default new Vuex.Store({
         return a.compare(b);
       });
     },
+    // clear timeline (history) for check-in/check-out data that longer than dayAfter
+    clearHistory(state, dayAfter) {
+      state.shops.forEach(shop => {
+        shop.clearHistory(dayAfter);
+      });
+    },
     setMobileNumber(state, mobileNumber) {
       state.mobileNumber = mobileNumber;
     },
@@ -50,7 +57,7 @@ export default new Vuex.Store({
   },
   actions: {
     // restore state data from localStorage
-    restoreState({ state }) {
+    restoreState({ state, commit }) {
       console.log("Restoring state ...");
       state.mobileNumber = localStorage.mobileNumber || null;
       state.authKey = localStorage.authKey || null;
@@ -71,6 +78,12 @@ export default new Vuex.Store({
         }
       }
       console.log("State restored!");
+      console.log("Cleaning history longer than 28 days...");
+
+      // clear some check-in history that longer than 28 days
+      commit("clearHistory", 14);
+
+      console.log("Cleaned!");
     },
     saveState({ state }) {
       console.log("Saving state ...");
@@ -82,7 +95,7 @@ export default new Vuex.Store({
       console.log(localStorage.shops);
       console.log("State saved!");
     },
-    async auth({ commit, dispatch }, mobileNumber) {
+    async auth({ state, commit, dispatch }, mobileNumber) {
       console.log("Authenticating...");
       let authKey = null;
       let authTime = new Date();
@@ -106,6 +119,10 @@ export default new Vuex.Store({
         expiredIn = parseInt(response.data.expiredIn) * 1000;
 
         if (authKey) {
+          // if mobile number is changed, then clear history of old mobile number
+          if (state.mobileNumber !== mobileNumber) {
+            commit("clearHistory", 0);
+          }
           commit("setMobileNumber", mobileNumber);
           commit("setAuthValue", { authKey, authTime, expiredIn });
           dispatch("saveState");
@@ -331,3 +348,8 @@ export default new Vuex.Store({
     }
   }
 });
+
+// early restore before router work because we need information that stored in localStorage to check auth in app
+store.dispatch("restoreState");
+
+export default store;

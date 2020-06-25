@@ -1,6 +1,6 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
-//import store from "@/store";
+import store from "@/store";
 import Register from "@/views/Register.vue";
 import Scan from "@/views/Scan.vue";
 import Shops from "@/views/Shops.vue";
@@ -60,16 +60,18 @@ const router = new VueRouter({
   routes
 });
 
-// router.beforeEach((to, from, next) => {
-//   console.log(to);
-//   if (to.meta.requiresAuth && !store.getters.isAuth) {
-//     // redirect to register page if not authenticated in and trying to access a restricted page
-//     console.log("Need register!!!!");
-//     next("/register");
-//   } else {
-//     console.log("No need register!!!");
-//     next();
-//   }
-// });
+router.beforeEach((to, from, next) => {
+  console.log(to);
+  console.log("Mobile number: ", store.getters.mobileNumber);
+  console.log("isAuth = ", store.getters.isAuth);
+  if (to.meta.requiresAuth && !store.getters.isAuth) {
+    // redirect to register page if not authenticated in and trying to access a restricted page
+    console.log("Need register!!!!");
+    next("/register");
+  } else {
+    console.log("No need register!!!");
+    next();
+  }
+});
 
 export default router;

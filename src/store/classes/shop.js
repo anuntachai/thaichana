@@ -1,4 +1,5 @@
 // Shop data
+const moment = require("moment");
 
 class Shop {
   constructor(shopId, appId) {
@@ -61,13 +62,30 @@ class Shop {
     // }
   }
 
+  // clear timeline (history) for check-in/check-out data that longer than dayAfter
+  clearHistory(dayAfter) {
+    let newHistory = [];
+
+    let filterTime = moment();
+    filterTime.subtract(dayAfter, "days");
+
+    this.history.forEach(event => {
+      // if ( now - event's check-in time ) < dayAfter, then keep this event
+      if (filterTime.isBefore(event.checkInTime)) {
+        newHistory.push(event);
+      }
+    });
+
+    this.history = newHistory;
+  }
+
   compare(shop) {
     if (this.isStay && !shop.isStay) {
       return -1;
     } else if (!this.isStay && shop.isStay) {
       return 1;
     } else {
-      return this.checkInTime - shop.checkInTime;
+      return shop.checkInTime - this.checkInTime;
     }
   }
 

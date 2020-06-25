@@ -1,8 +1,9 @@
 import Vue from "vue";
 import App from "./App.vue";
 import "./registerServiceWorker";
-import router from "./router";
+// import store before router. because we need to get data from localStorage to store before router use them.
 import store from "./store";
+import router from "./router";
 import "bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import VueQrcodeReader from "vue-qrcode-reader";
@@ -51,7 +52,13 @@ new Vue({
   render: h => h(App),
   vuetify,
 
+  beforeCreate() {
+    //store.dispatch("restoreState");
+    console.log("beforeCreate: mobileNumber = ", store.getters.mobileNumber);
+  },
+
   mounted() {
-    store.dispatch("restoreState");
+    console.log("mounted: mobileNumber = ", store.getters.mobileNumber);
+    //store.dispatch("restoreState");
   }
 }).$mount("#app");
