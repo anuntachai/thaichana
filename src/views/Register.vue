@@ -42,7 +42,8 @@
         ><v-icon>mdi-cellphone-key</v-icon> Authentication Key: <br />{{
           authKey
         }}<br /><br />
-        <v-icon>mdi-clock-time-four-outline</v-icon> Authenticated Time: <br />{{ authTime }}</v-card-subtitle
+        <v-icon>mdi-clock-time-four-outline</v-icon> Authenticated Time:
+        <br />{{ authTime }}</v-card-subtitle
       >
 
       <v-card-actions>

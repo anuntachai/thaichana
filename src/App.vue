@@ -51,13 +51,12 @@
         <v-badge
           color="success"
           :content="activeCheckIn"
+          :value="activeCheckIn"
           overlap
           offset-x="2"
-          v-if="activeCheckIn"
         >
           <v-icon>mdi-home-city-outline</v-icon>
         </v-badge>
-        <v-icon v-if="!activeCheckIn">mdi-home-city-outline</v-icon>
       </v-btn>
 
       <v-btn value="Timeline" @click="changePage('/timeline')">
